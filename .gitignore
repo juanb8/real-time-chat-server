@@ -1,0 +1,6 @@
+node_modules/
+src/*
+!/src/message-service/
+__test__/*
+!/__test__/message-service/
+
