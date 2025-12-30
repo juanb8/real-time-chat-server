@@ -3,4 +3,5 @@ src/*
 !/src/message-service/
 __test__/*
 !/__test__/message-service/
+!/__test__/factories/
 

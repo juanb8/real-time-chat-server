@@ -1,4 +1,7 @@
-import { RedisConnectionService, type IConnectionService } from "../../../src/message-service/services/ConnectionService";
+import {
+  RedisConnectionService,
+  type IConnectionService
+} from "../../../src/message-service/services/ConnectionService";
 
 import connectionFactory, {
   type IMockConnection,

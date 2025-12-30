@@ -1,23 +1,13 @@
 // src/message-service/services/MessageService.ts
-import type { IMessage } from '../../../models/Message';
-import { MessageRepository } from '../../../repositories/MessageRepository';
-import { type IConnectionService } from '../ConnectionService.interface';
+import type { IMessage } from '../../models/Message';
+import { MessageRepository } from '../../repositories/MessageRepository';
+import type { IConnectionService } from '../ConnectionService';
 
-export interface SendMessageData {
-  senderId: string;
-  recipientId: string;
-  content: string;
-  messageType?: 'text' | 'location' | 'alert' | 'system';
-  tempId?: string;
-  metadata?: any;
-}
+import {
+  type SendMessageData,
+  type MessageDeliveryResult
+} from './MessageService.interface';
 
-export interface MessageDeliveryResult {
-  success: boolean;
-  message: IMessage;
-  delivered: boolean;
-  error?: string;
-}
 
 export class MessageService {
   private messageRepository: MessageRepository;
@@ -45,7 +35,7 @@ export class MessageService {
         status: 'sent',
         tempId: data.tempId,
         metadata: data.metadata
-      };
+      } as Partial<IMessage>;
 
       const message = await this.messageRepository.saveMessage(messageData);
 
