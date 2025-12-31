@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { Message } from "../../../src/message-service/models/Message"
-import mongoose from "mongoose"
+import { Message } from "../../../src/message-service/models/Message";
+import mongoose from "mongoose";
+import { faker } from "@faker-js/faker";
 
 describe("Message model test suite", (): void => {
   const bare_message_content = {
@@ -115,6 +116,28 @@ describe("Message model test suite", (): void => {
         expect(savedMessage._id.toString()).toBe(retrievedMessage._id.toString());
       }
     });
+
+  test("updateMany for a not saved message",
+    async (): Promise<void> => {
+      const non_existing_id = new mongoose
+        .Types.
+        ObjectId(faker.database.mongodbObjectId());
+
+      expect(await Message.updateMany(
+        {
+          _id: non_existing_id
+        },
+        {
+          $set: {
+            read: true,
+            readAt: new Date(),
+            status: 'read'
+          }
+        }
+      )).toThrow();
+
+    }
+  );
 })
 
 

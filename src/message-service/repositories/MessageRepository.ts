@@ -51,7 +51,9 @@ export class MessageRepository {
       .lean();
   }
 
-  async markAsRead(messageIds: string[], readerId: string): Promise<number> {
+  async markAsRead(
+    messageIds: string[],
+    readerId: string): Promise<number> {
     const result = await Message.updateMany(
       {
         _id: { $in: messageIds },

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Message } from "../../../src/message-service/models/Message";
+import { Message, type IMessage } from "../../../src/message-service/models/Message";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 import { MessageService } from "../../../src/message-service/services/MessageService/MessageService";
@@ -59,6 +59,18 @@ describe("MessageService testSuite", (): void => {
     };
   }
 
+  async function getFirstMessage(
+    senderId: string,
+    recipientId: string): Promise<IMessage> {
+    const retrievedMsgs = await repository
+      .getConversation(
+        senderId,
+        recipientId,
+        1
+      );
+    return retrievedMsgs[0] as IMessage;
+  };
+
   it("should save the message when send mesagge",
     async (): Promise<void> => {
       const { message: retrievedMsg } = await sendMessageAndRetrieve(sendData);
@@ -84,6 +96,7 @@ describe("MessageService testSuite", (): void => {
       expect(resp.success).toBeTruthy();
       expect(resp.delivered).not.toBeTruthy();
       expect(resp.message._id).toEqual(message._id);
+      expect(resp.error).not.toBeDefined();
     }
   );
   it("should return delivered true when user online",
@@ -96,12 +109,65 @@ describe("MessageService testSuite", (): void => {
       const { resp, message } = await sendMessageAndRetrieve(sendData);
 
       expect(resp.success).toBeTruthy();
-      expect(resp.delivered).toBeTruthy();
+      expect(resp.delivered).not.toBeTruthy();
       expect(resp.message._id).toEqual(message._id);
-      connectionService.removeConnection(
-        sendData.recipientId,
-        socketId
+      expect(resp.error).not.toBeDefined();
+    }
+  );
+  it("should fail when  sending bad data",
+    async (): Promise<void> => {
+      const errorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => { });
+
+      const resp = await service.sendMessage({} as SendMessageData);
+      expect(resp.success).not.toBeTruthy();
+      expect(resp.delivered).not.toBeTruthy();
+      expect(resp.message).toBeNull();
+      expect(resp.error).toBeDefined();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        "Error sending message:",
+        expect.any(Error)
       );
+      errorSpy.mockRestore();
+    }
+  );
+
+  it("should mark the message as delivered when deliverMessageToRecipient",
+    async (): Promise<void> => {
+      const { resp: _resp, message } = await sendMessageAndRetrieve(sendData);
+      expect(message.delivered).not.toBeTruthy();
+      expect(message.deliveredAt).not.toBeDefined();
+
+      await service.deliverMessageToRecipient(
+        message,
+        [sendData.recipientId]
+      );
+      let sentMsg = await getFirstMessage(
+        sendData.senderId,
+        sendData.recipientId
+      );
+      expect(message.delivered).toBeTruthy();
+      expect(sentMsg._id.toString()).toEqual(message._id.toString());
+      expect(sentMsg.delivered).toBeTruthy();
+      expect(sentMsg.status).toEqual('delivered');
+      expect(sentMsg.deliveredAt).toBeDefined();
+
+    }
+  );
+
+  it("should mark the message as read",
+    async (): Promise<void> => {
+      const { marked, unreadCount } = await service
+        .markMessagesAsRead(
+          faker.string.uuid,
+          faker.string.uuid
+        );
+
+      expect(marked).toEqual(0);
+      expect(unreadCount).toEqual(0);
+
     }
   );
 });

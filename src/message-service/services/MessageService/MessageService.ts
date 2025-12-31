@@ -93,15 +93,22 @@ export class MessageService {
     messageIds: string[],
     readerId: string
   ): Promise<{ marked: number; unreadCount: number }> {
-    const marked = await this.messageRepository.markAsRead(messageIds, readerId);
+    const marked = await this.messageRepository
+      .markAsRead(messageIds, readerId);
 
     // For each unique conversation, reset unread count
     const messages = await Promise.all(
-      messageIds.map(id => this.messageRepository.getConversation('', '')) // Simplified
+      messageIds.map(id =>
+        this.messageRepository
+          .getConversation('', '')) // Simplified
     );
 
     // Get unique senders
-    const uniqueSenders = [...new Set(messages.map(m => m.senderId))];
+    const uniqueSenders = [...new Set(
+      messages.map(
+        m => m.senderId)
+    )
+    ];
 
     // Reset unread counts
     for (const senderId of uniqueSenders) {
