@@ -100,7 +100,8 @@ export class MessageService {
     const messages = await Promise.all(
       messageIds.map(id =>
         this.messageRepository
-          .getConversation('', '')) // Simplified
+          .getConversation('', '')
+      ) // Simplified
     );
 
     // Get unique senders
@@ -112,7 +113,11 @@ export class MessageService {
 
     // Reset unread counts
     for (const senderId of uniqueSenders) {
-      await this.messageRepository.resetUnreadCount(readerId, senderId);
+      await this.messageRepository
+        .resetUnreadCount(
+          readerId,
+          senderId
+        );
     }
 
     return {

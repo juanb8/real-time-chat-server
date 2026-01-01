@@ -77,6 +77,7 @@ describe("MessageService testSuite", (): void => {
       expect(retrievedMsg?.senderId).toEqual(sendData.senderId);
       expect(retrievedMsg?.recipientId).toEqual(sendData.recipientId);
       expect(retrievedMsg?.content).toEqual(sendData.content);
+      expect(retrievedMsg?.status).toEqual('sent');
 
       const retrievedConvos = await repository
         .getConversations(
@@ -156,18 +157,48 @@ describe("MessageService testSuite", (): void => {
 
     }
   );
+  async function expectMarkMessageAsReadToMarkAndHaveUnreadCount(
+    messagesIds: string[],
+    readerId: string,
+    expectedMarkCount: number,
+    expectedUnreadCount: number
+  ): Promise<void> {
+    const { marked, unreadCount } = await service
+      .markMessagesAsRead(
+        messagesIds,
+        readerId
+      );
 
-  it("should mark the message as read",
+    expect(marked).toEqual(expectedMarkCount);
+    expect(unreadCount).toEqual(expectedUnreadCount);
+  }
+
+  it("should not  mark the message as read when the message doesn't exist",
     async (): Promise<void> => {
-      const { marked, unreadCount } = await service
-        .markMessagesAsRead(
-          faker.string.uuid,
-          faker.string.uuid
-        );
+      await expectMarkMessageAsReadToMarkAndHaveUnreadCount(
+        [faker.database.mongodbObjectId()],
+        faker.string.uuid(),
+        0,
+        0
+      );
+    }
+  );
+  it("should mark as read a sent message",
+    async (): Promise<void> => {
+      const { resp: _resp, message } = await sendMessageAndRetrieve(sendData);
+      expect(message.status).toEqual("sent");
 
-      expect(marked).toEqual(0);
-      expect(unreadCount).toEqual(0);
+      await expectMarkMessageAsReadToMarkAndHaveUnreadCount(
+        [message._id],
+        message.recipientId,
+        1,
+        0
+      );
 
+      const markedMessage = await Message.findOne({
+        id: message._id
+      });
+      expect(markedMessage.status).toEqual('read');
     }
   );
 });
