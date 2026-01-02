@@ -1,4 +1,4 @@
-
+import { type IMessage } from '../../models/Message';
 export interface SendMessageData {
   senderId: string;
   recipientId: string;

@@ -46,11 +46,11 @@ describe("MessageService testSuite", (): void => {
   });
   async function sendMessageAndRetrieve(data: SendMessageData)
     : Promise<any> {
-    const resp = await service.sendMessage(sendData);
+    const resp = await service.sendMessage(data);
     const retrievedMsgs = await repository
       .getConversation(
-        sendData.senderId,
-        sendData.recipientId,
+        data.senderId,
+        data.recipientId,
         1
       );
     return {
@@ -195,10 +195,46 @@ describe("MessageService testSuite", (): void => {
         0
       );
 
-      const markedMessage = await Message.findOne({
-        id: message._id
-      });
-      expect(markedMessage.status).toEqual('read');
+      const markedMessage = await repository.getMessageById(message._id);
+      expect(markedMessage?.status).toEqual('read');
+
+      const convos = await repository.getConversations(message.recipientId);
+      expect(convos.length).toEqual(1);
+      expect(convos[0]?.unreadCount).toEqual(0);
     }
   );
+
+  it("should mark as read a sent message and as unread an unread message",
+    async (): Promise<void> => {
+      const { resp: _resp, message: sent_msg_1 } = await sendMessageAndRetrieve(sendData);
+      const { resp: _resp1, message: sent_msg_2 } = await sendMessageAndRetrieve(
+        sendDataFactory({ recipientId: sent_msg_1.recipientId })
+      );
+      expect(sent_msg_1.status).toEqual("sent");
+      expect(sent_msg_2.status).toEqual("sent");
+
+      expect(sent_msg_1.senderId).not.toEqual(sent_msg_2.senderId);
+
+      await expectMarkMessageAsReadToMarkAndHaveUnreadCount(
+        [sent_msg_1._id],
+        sent_msg_1.recipientId,
+        1,
+        1
+      );
+
+      const notMarkedMessage = await repository.getMessageById(sent_msg_2._id);
+      expect(notMarkedMessage?.status).not.toEqual('read');
+
+      const convos = await repository.getConversations(sent_msg_1.recipientId);
+      expect(convos.length).toEqual(2);
+      expect(convos[0]?.unreadCount).toEqual(1);
+      expect(convos[1]?.unreadCount).toEqual(0);
+    }
+  );
+  it("should getMessagesForSync",
+    async (): Promise<void> => {
+
+    }
+  );
+
 });

@@ -41,6 +41,12 @@ export class MessageRepository {
       .limit(limit)
       .lean();
   }
+  async getMessageById(msgId: string): Promise<IMessage> {
+    return Message.findOne({
+      _id: msgId
+    }).lean();
+
+  };
 
   async getUnreadMessages(userId: string): Promise<IMessage[]> {
     return await Message.find({

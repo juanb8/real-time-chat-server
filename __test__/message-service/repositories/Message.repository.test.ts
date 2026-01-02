@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { MessageRepository } from "../../../src/message-service/repositories/MessageRepository";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { Message, type IMessage } from "../../../src/message-service/models/Message";
+import { faker } from "@faker-js/faker";
 
 describe("MessageRepository test suite", (): void => {
   const repository = new MessageRepository();
@@ -114,6 +115,17 @@ describe("MessageRepository test suite", (): void => {
       expect(retrievedMessages[0]?.timestamp.getFullYear()).toEqual(1200);
     });
 
+  test("getConversation of an empty id should return the empy list",
+    async (): Promise<void> => {
+      await repository.saveMessage(bare_message_content);
+      const retrieved_messages = await repository.getConversation(
+        '', ''
+      );
+      expect(retrieved_messages.length).toEqual(0);
+    }
+  );
+
+
   test("getUnreadMessages should returns all the unread messages", async (): Promise<void> => {
     const saved_message = await repository.saveMessage(bare_message_content);
     let retrieved_messages = await repository.getUnreadMessages(bare_message_content.recipientId);
@@ -210,5 +222,19 @@ describe("MessageRepository test suite", (): void => {
         new Date('2020'));
     expect(syncedMessages.length).toEqual(1);
   });
+  test("getMessageById should get message(by id)",
+    async (): Promise<void> => {
+      const savedMessage = await repository.saveMessage(bare_message_content);
+      const retrievedMessage = await repository.getMessageById(savedMessage._id);
+      expect(retrievedMessage._id).toEqual(savedMessage._id);
+    }
+  );
+  test("getMessageById should return null when message doesn't exist",
+    async (): Promise<void> => {
+      await repository.saveMessage(bare_message_content);
+      const retrievedMessage = await repository.getMessageById(faker.database.mongodbObjectId());
+      expect(retrievedMessage).toEqual(null);
+    }
+  );
 
 });

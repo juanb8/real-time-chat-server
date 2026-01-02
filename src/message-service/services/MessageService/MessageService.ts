@@ -100,14 +100,17 @@ export class MessageService {
     const messages = await Promise.all(
       messageIds.map(id =>
         this.messageRepository
-          .getConversation('', '')
+          .getMessageById(id)
       ) // Simplified
     );
 
     // Get unique senders
     const uniqueSenders = [...new Set(
-      messages.map(
-        m => m.senderId)
+      (messages
+        .filter(msg => msg != null))
+        .map(
+          m => m.senderId
+        )
     )
     ];
 
@@ -132,7 +135,9 @@ export class MessageService {
   }
 
   async syncMessages(userId: string, lastSyncTime: Date): Promise<IMessage[]> {
-    return await this.messageRepository.getMessagesForSync(userId, lastSyncTime);
+    return await this
+      .messageRepository
+      .getMessagesForSync(userId, lastSyncTime);
   }
 
   async getConversation(
