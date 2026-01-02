@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Message, type IMessage } from "../../../src/message-service/models/Message";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-import { MessageService } from "../../../src/message-service/services/MessageService/MessageService";
+import { MessageService } from "../../../src/message-service/services/MessageService";
 import {
   RedisConnectionService,
   type IConnectionService
