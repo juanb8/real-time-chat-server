@@ -121,10 +121,10 @@ class MockServer {
   }
 
   // Socket.io Server methods
-  sockets = {
-    emit: (event: string, ...args: any[]) => this.emit(event, ...args)
-  };
-
+  //  sockets = {
+  //    emit: (event: string, ...args: any[]) => this.emit(event, ...args)
+  //  };
+  //
   // Additional properties
   adapter = {
     rooms: new Map(),

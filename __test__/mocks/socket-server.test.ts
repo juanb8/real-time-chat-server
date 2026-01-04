@@ -1,8 +1,20 @@
 // socket-server.test.ts
 import { Server } from 'socket.io';
 import { SocketServerTestHelper } from "./socket-server-test-helpet";
+import {
+  MockServer,
+  MockSocket
+} from './socket.io';
 // This automatically uses the mock
-jest.mock('socket.io');
+jest.mock('socket.io', () => {
+  return {
+    Server: jest
+      .fn()
+      .mockImplementation(
+        () => new MockServer()
+      )
+  }
+});
 
 describe('Socket.io Server', () => {
   let io: any;
@@ -14,7 +26,7 @@ describe('Socket.io Server', () => {
   });
 
   afterEach(() => {
-    SocketServerTestHelper.clearServer(server);
+    io._clearAllSockets();
   });
 
   test('should create server instance', () => {
