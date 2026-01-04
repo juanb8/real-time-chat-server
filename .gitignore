@@ -1,7 +1,9 @@
 node_modules/
 src/*
+sprints/
 !/src/message-service/
 __test__/*
+!/__test__/mocks
 !/__test__/message-service/
 !/__test__/factories/
 
