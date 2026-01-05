@@ -8,6 +8,7 @@ import { MessageService } from "../../../src/message-service/services/MessageSer
 import { faker } from "@faker-js/faker";
 import { sendDataFactory } from "../../factories/MessageService.factory";
 import type { IMessage } from "../../../src/message-service/models/Message";
+import type { promises } from "dns";
 
 
 const fetchSocketsSpy = jest.fn();
@@ -125,6 +126,19 @@ describe("Delivery Service test suite", (): void => {
         );
       expect(io.to)
         .toHaveBeenCalledWith(`user-${readerId}`);
+    }
+  );
+
+  it("should broadcastToRoom ",
+    async (): Promise<void> => {
+      const room = faker.string.uuid();
+      const event = faker.lorem.words();
+      const data = {
+        _id: faker.string.uuid(),
+      };
+      await service.broadcastToRoom(room, event, data);
+      expect(io.to).toHaveBeenCalledWith(room);
+
     }
   );
 }); 
