@@ -66,10 +66,14 @@ export class DeliveryService implements IDeliveryService {
     // In real implementation, fetch from database
     // For now, emit to sender's room
 
-    this.io.to(`user-${readerId}`).emit('message-read', {
-      messageId,
-      readAt: new Date()
-    });
+    this.io
+      .to(`user-${readerId}`)
+      .emit('message-read',
+        {
+          messageId,
+          readAt: new Date()
+        }
+      );
   }
 
   async broadcastToRoom(
@@ -88,8 +92,13 @@ export class DeliveryService implements IDeliveryService {
   async getSocketIds(userId: string): Promise<string[]> {
     // This would come from ConnectionService
     // Simplified for this example
-    const sockets = await this.io.in(`user-${userId}`).fetchSockets();
-    return sockets.map(socket => socket.id);
+    const sockets = await this
+      .io
+      .in(`user-${userId}`)
+      .fetchSockets();
+    return sockets
+      .map(
+        socket => socket.id);
   }
 
   async notifyUserOnline(userId: string, contacts: string[]): Promise<void> {
