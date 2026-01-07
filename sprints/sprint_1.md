@@ -23,20 +23,21 @@
   - [] broadCastToRoom
   - [] getSocketIds
   - [] notifyUserOnline
-  - []  notifyUserOffline
-- [] 1.2 MessageHandler
-- [] 1.3 PresenceHandler
-- [] 1.4 Main Message Service setup (index.ts)
+  - [] notifyUserOffline
+- [x] 1.2 MessageHandler: 10min
+  - [x] Understanding the role of this
+  - [x] make decision about testing or not
+- [x] 1.3 PresenceHandler
+  - [x] Understanding role of PresenceHandler
+  - [x] Decision about testing
+- [x] 1.4 Main Message Service setup (index.ts)
 - [] 1.5 Integrating with main server
 - [] 1.6 Rest API routes
 
 ## working
 
-- Test delivery service: 4 pomodoro
-- broadCastToRoom
+- [] 1.5 Integrating with main server
 
-> t = 50 min
->
 ## Review
 
 I did 1 50' and get stuck with mocking socket.io
@@ -52,7 +53,7 @@ mock socket.io correctly
 later i realize it was useless
 don't mock libraries!
 
-### For  notifySenderOfRead the grandma
+### For notifySenderOfRead the grandma
 
 started to talk
 
@@ -83,15 +84,16 @@ fetch from database, but why?
 If i already have the messageId
 maybe to confirm it exists or the date
 
-### broadCastToRoom
-gets: 
-  - room:string   -> faker
-  - event:string -> faker 
-  - data: any?
-  - excludeSocketId?
+### About message handler
 
+This handler just uses the socket.io routes
+and redirects to the services
+because i'm trying to be faster i don't gonna
+test this.
 This is used for dynamic implementation
 so that the client render's it's own message
 
-the only thing i must to test is io.to and .emit events
+### About presence handler
 
+This just pings a user and get's online status.
+I don't know where it is used.
