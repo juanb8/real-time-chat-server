@@ -1,6 +1,6 @@
 node_modules/
 src/*
-sprints/
+!/sprints
 !/src/message-service/
 __test__/*
 !/__test__/mocks
